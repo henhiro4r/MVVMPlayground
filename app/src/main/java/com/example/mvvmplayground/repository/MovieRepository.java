@@ -19,15 +19,16 @@ import retrofit2.Response;
 public class MovieRepository {
     private static MovieRepository movieRepository;
     private ApiEndpoints apiEndpoints;
+    private RetrofitService apiService;
     private static final String TAG = "MovieRepository";
 
-    public MovieRepository(ApiEndpoints apiEndpoints) {
-        this.apiEndpoints = apiEndpoints;
+    private MovieRepository() {
+        apiService = RetrofitService.getInstance();
     }
 
     public static MovieRepository getInstance() {
         if (movieRepository == null) {
-            movieRepository = new MovieRepository(RetrofitService.createService(ApiEndpoints.class));
+            movieRepository = new MovieRepository();
         }
         return movieRepository;
     }
@@ -35,12 +36,12 @@ public class MovieRepository {
     public MutableLiveData<List<Movie>> getMovieCollection() {
         MutableLiveData<List<Movie>> listMovie = new MutableLiveData<>();
 
-        apiEndpoints.getMovies(Constants.API_KEY).enqueue(new Callback<MovieResponse>() {
+        apiService.getMovies().enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
-                        Log.d(TAG, "onResponse: " + response.body().getPages());
+                        Log.d(TAG, "onResponse: " + response.body().getResults().size());
                         listMovie.postValue(response.body().getResults());
                     }
                 }
@@ -51,6 +52,23 @@ public class MovieRepository {
                 Log.d(TAG, "onFailure: " + t.getMessage());
             }
         });
+
+//        apiEndpoints.getMovies(Constants.API_KEY).enqueue(new Callback<MovieResponse>() {
+//            @Override
+//            public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+//                if (response.isSuccessful()) {
+//                    if (response.body() != null) {
+//                        Log.d(TAG, "onResponse: " + response.body().getPages());
+//                        listMovie.postValue(response.body().getResults());
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<MovieResponse> call, Throwable t) {
+//                Log.d(TAG, "onFailure: " + t.getMessage());
+//            }
+//        });
 
         return listMovie;
     }
