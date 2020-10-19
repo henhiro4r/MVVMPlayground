@@ -53,7 +53,7 @@ public class MovieFragment extends Fragment {
         Movie movie = new Movie();
 
         button.setOnClickListener(view1 -> {
-            NavDirections action = MovieFragmentDirections.actionDetailFragment(movie);
+            NavDirections action = MovieFragmentDirections.actionMovieToDetail(movie);
             Navigation.findNavController(view).navigate(action);
         });
     }
